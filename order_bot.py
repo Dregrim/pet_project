@@ -134,7 +134,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    app = ApplicationBuilder().token("8096008190:AAHepIlz_iYiGPbrDpztZbchXqY_1pa6Zg4").build()
+    app = ApplicationBuilder().token("").build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("orders", orders))
