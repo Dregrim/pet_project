@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block title %}Список клієнтів{% endblock %} {% block content %}
+
+<h1>Список складів</h1>
+<table border="1" class="table table-striped">
+  <tr>
+    <th cope="col">ID</th>
+    <th cope="col">Назва</th>
+    <th cope="col">IMEI</th>
+    <th cope="col">Дія</th>
+  </tr>
+  {% for product in products.availabilities.all %}
+  <tr>
+    <td>{{ product.id }}</td>
+    <td>{{ product.product.name }}</td>
+    <td>{{ product.imei }}</td>
+    <td scope="row">
+      <div class="d-flex">
+        <form method="post" action="">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm me-2">Перемістити</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4">Товари відсутні</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

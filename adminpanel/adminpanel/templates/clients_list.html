@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% block title %}Список клієнтів{% endblock %} {% block content %}
+<h1>Додати клієнта</h1>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="first_name" placeholder="Ім'я" required />
+  <input type="text" name="last_name" placeholder="Прізвище" />
+  <input type="text" name="tel_number" placeholder="Телефон" required />
+  <input type="email" name="email" placeholder="Email" />
+  <button type="submit">Додати</button>
+</form>
+<h2>Пошук по номеру телефону</h2>
+<form method="get" class="d-flex mb-3">
+  <input type="text" name="search_tel" class="form-control me-2" placeholder="Введіть номер телефону" value="{{ request.GET.search_tel }}" />
+  <button type="submit" class="btn btn-primary">Знайти</button>
+  <a href="{% url 'clients_list' %}" class="btn btn-secondary ms-2">Скинути</a>
+</form>
+<h1>Список клієнтів</h1>
+<table border="1" class="table table-striped">
+  <tr>
+    <th cope="col">ID</th>
+    <th cope="col">Ім'я</th>
+    <th cope="col">Прізвище</th>
+    <th cope="col">Телефон</th>
+    <th cope="col">Email</th>
+    <th cope="col">Дія</th>
+  </tr>
+  {% for client in clients %}
+  <tr>
+    <td>{{ client.id }}</td>
+    <td>{{ client.first_name }}</td>
+    <td>{{ client.last_name }}</td>
+    <td>{{ client.tel_number }}</td>
+    <td>{{ client.email }}</td>
+    <td scope="row">
+      <div class="d-flex">
+        <form method="post" action="{% url 'delete_client' client.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm me-2">Видалити</button>
+        </form>
+        <form method="get" action="{% url 'edit_client' client.id %}">
+          <button type="submit" class="btn btn-warning btn-sm me-2">Редагувати</button>
+        </form>
+        <form method="post" action="{% url 'client_orders' client.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm me-2">Замовлення</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="6">Клієнтів не знайдено</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

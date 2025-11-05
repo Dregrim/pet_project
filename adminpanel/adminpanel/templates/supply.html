@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title%}Замовлення {{order.id}}{% endblock %}
+{% block content %}
+    <h1>Замовлення №{{supply.id}}</h1>
+    
+    <div class="row">
+        <div class="col-6">
+            <div class="col">
+                <div class="row">
+                    <div class="col-6">
+                        <b>Постачальний</b>
+                        <form method="post" action="" id="composition-form">
+                            <!-- url 'change_composition' order.id -->
+                            {% csrf_token %}
+                            <select id="composition" name="composition" style="width:300px;" class="form-select">
+                                
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <b>Статус поставки</b>
+                        <form method="get" action="" class="col-6" >
+                            <select name="status" onchange="" class="form-select">
+                                
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <b>Склад</b>
+                        <form method="post" action="" id="composition-form">
+                            <!-- url 'change_composition' order.id -->
+                            {% csrf_token %}
+                            <select id="composition" name="composition" style="width:300px;" class="form-select">
+                                
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <h1>Додати товар</h1>
+    <form method="post" action="">
+        {% csrf_token %}
+        <select id="product" name="product" style="width:300px;">
+            
+        </select>
+        <input type="number" name="quantity" min="1" value="1">
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+    <h1>Товари</h1>
+    <table border="1" class="table table-striped">
+      <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Назва товару</th>
+                        <th>Ціна</th>
+                        <th>IMEI</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <form method="post" action="" class="col-6" id="imei-form">
+                                <!-- url 'change_supply_item_price' supply.id item.id -->
+                                {% csrf_token %}
+                                
+                                <input type="text" placeholder="Ціна закупки" id="price" name="price">
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="" class="col-6" id="imei-form">
+                                <!-- url 'change_supply_item_imei' supply.id item.id -->
+                                {% csrf_token %}
+                                <input type="text" placeholder="IMEI" id="imei" name="imei">
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="">
+                                <!-- url 'delete_supply_item' item.id -->
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">Товари відсутні</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+    </table>
+    <div class="row">
+        <div class="col-9"></div>
+        <div class="col-3">
+            <form method="post" action="{% url 'supplies' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Назад</button>
+            </form>
+        </div>
+    </div>
+  </body>
+</html>
+<script>
+    
+</script>
+
+{% endblock %}

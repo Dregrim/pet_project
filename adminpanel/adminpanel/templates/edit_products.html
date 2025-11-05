@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block title %}Список товарів{% endblock %} {% block content %}
+<h1>Редагувати товар {{ product.name }}</h1>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="name" value="{{ product.name }}" required />
+  <input type="text" name="category" value="{{ product.category }}" />
+  <input type="number" name="price" value="{{ product.price }}" required />
+  <button type="submit" class="btn btn-success">Зберегти</button>
+  <a href="{% url 'products_list' %}" class="btn btn-secondary">Скасувати</a>
+</form>
+{% endblock %}

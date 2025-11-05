@@ -1,0 +1,21 @@
+<!-- <h1>Редагувати клієнта {{ client.id }}</h1>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="first_name" value="{{ client.first_name }}" required />
+  <input type="text" name="last_name" value="{{ client.last_name }}" />
+  <input type="text" name="tel_number" value="{{ client.tel_number }}" required />
+  <input type="email" name="email" value="{{ client.email }}" />
+  <button type="submit" class="btn btn-success">Зберегти</button>
+  <a href="{% url 'clients_list' %}" class="btn btn-secondary">Скасувати</a>
+</form> -->
+
+<h1>Редагувати клієнта {{ client_id }}</h1>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="first_name" value="{{ client.0 }}" required />
+  <input type="text" name="last_name" value="{{ client.1 }}" />
+  <input type="text" name="tel_number" value="{{ client.2 }}" required />
+  <input type="email" name="email" value="{{ client.3 }}" />
+  <button type="submit" class="btn btn-success">Зберегти</button>
+  <a href="{% url 'clients_list' %}" class="btn btn-secondary">Скасувати</a>
+</form>

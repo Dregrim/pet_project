@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block title %}Список товарів{% endblock %} {% block content %}
+<h1>Список товарі</h1>
+<table border="1" class="table table-striped">
+  <tr>
+    <th cope="col">ID</th>
+    <th cope="col">Назва</th>
+    <th cope="col">Категорія</th>
+    <th cope="col">№ Замовлення</th>
+    <th cope="col">Дія</th>
+  </tr>
+  {% for item in items %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.product.name }}</td>
+    <td>{{ item.product.category }}</td>
+    <td>{{ item.order_id }}</td>
+    <td scope="row">
+      <div class="d-flex">
+        <form method="post" action="{% url 'create_supply' item.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm me-2">Замовити</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="5">Товарів не знайдено</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock%}

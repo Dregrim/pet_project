@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}Список замовлень{% endblock %} {% block content %}
+<h2>Пошук по номеру телефону</h2>
+<form method="get" class="d-flex mb-3">
+  <input type="text" name="search_tel" class="form-control me-2" placeholder="Введіть номер телефону" value="{{ request.GET.search_tel }}" />
+  <button type="submit" class="btn btn-primary">Знайти</button>
+  <a href="{% url 'orders_list' %}" class="btn btn-secondary ms-2">Скинути</a>
+</form>
+<h1>Список замовлень</h1>
+<table border="1" class="table table-striped">
+  <tr>
+    <th cope="col">№</th>
+    <th cope="col">Статус</th>
+    <th cope="col">Дата</th>
+    <th cope="col">Ім'я</th>
+    <th cope="col">Телефон</th>
+    <th cope="col">Дія</th>
+  </tr>
+  {% for order in orders %}
+  <tr>
+    <td>{{ order.id }}</td>
+    <td>{{ order.status }}</td>
+    <td>{{ order.date }}</td>
+    <td>{{ order.client.first_name }}</td>
+    <td>{{ order.client.tel_number }}</td>
+    <td scope="row">
+      <div class="d-flex">
+        <form method="post" action="{% url 'order' order.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm me-2">Переглянути</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="6">Клієнтів не знайдено</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

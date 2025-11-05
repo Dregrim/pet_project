@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title%}Замовлення {{transportation.id}}{% endblock %}
+{% block content %}
+    <h1>Замовлення №{{transportation.id}}</h1>
+    <form method="post" action="{% url 'change_transportation_composition' transportation.id %}" class="row" id="composition-form">
+        {% csrf_token %}
+        <div class="col-3">
+            <label for="" class="form-label">Відправник</label>
+            <select id="sender" name="sender" style="width:300px;" class="form-select">
+                {% if transportation.sender_id %}
+                    <option value="{{ transportation.sender.id }}" selected>
+                        {{ transportation.sender.name }}
+                    </option>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-3">
+            <label for="" class="form-label">Отримувач</label>
+            <select id="receiver" name="receiver" style="width:300px;" class="form-select">
+                {% if transportation.receiver_id %}
+                    <option value="{{ transportation.receiver.id }}" selected>
+                        {{ transportation.receiver.name }}
+                    </option>
+                {% endif %}
+            </select>
+        </div>
+        
+    </form>
+    
+    <h1>Додати товар</h1>
+    <form method="post" action="{% url 'add_transportation_item' transportation.id %}">
+        {% csrf_token %}
+        <select id="product" name="product" style="width:300px;">
+            {% for item in transportation.transportationitems_set.all %}
+                <option value="{{ item.product.id }}">{{ item.product.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+    <h1>Товари</h1>
+    <table border="1" class="table table-striped">
+      <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Назва товару</th>
+                        <th>IMEI</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in transportation.transportationitems_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product.product.name }}</td>
+                        <td>
+                            <input type="text" name="imei" value="{{ item.imei }}">
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'delete_transportation_item' transportation.id item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Товари відсутні</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+    </table>
+    <div class="row">
+        <div class="col-9"></div>
+        <div class="col-3">
+            <form method="get" action="{% url 'transportations' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Назад</button>
+            </form>
+        </div>
+    </div>
+  </body>
+</html>
+<script>
+  $(document).ready(function () {
+    $("#product").select2({
+      placeholder: "Введіть назву або ID товару",
+      minimumInputLength: 1,
+      ajax: {
+        url: '{% url "availability_autocomplete" %}', // Django URL для JSON
+        dataType: "json",
+        delay: 250,
+        data: function (params) {
+          return { q: params.term, sender_id: $("#sender").val()  }; // term, що вводить користувач
+        },
+        processResults: function (data) {
+          return {
+            results: data.map(function (item) {
+              return { id: item.id, text: item.text };
+            }),
+          };
+        },
+        cache: true,
+      },
+    });
+  });
+
+
+function initSelect2(id) {
+    $(id).select2({
+        placeholder: 'Назва складу',
+        minimumInputLength: 1,
+        ajax: {
+            url: '{% url "compositions_autocomplete" %}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return { q: params.term };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.map(function(composition) {
+                        return { id: composition.id, text: composition.name };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+     $(id).on('change', function() {
+        $('#composition-form').submit();
+    });
+}
+
+$(document).ready(function() {
+    initSelect2('#sender');
+    initSelect2('#receiver');
+});
+</script>
+{% endblock %}

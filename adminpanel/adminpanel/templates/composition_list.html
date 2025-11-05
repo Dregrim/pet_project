@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% block title %}Список клієнтів{% endblock %} {% block content %}
+<h1>Створити склад</h1>
+<form method="post" action="">
+  {% csrf_token %}
+  <input type="text" name="name" placeholder="Назва" required />
+  <input type="text" name="address" placeholder="Адреса" />
+  <button type="submit">Додати</button>
+</form>
+<h1>Список складів</h1>
+<table border="1" class="table table-striped">
+  <tr>
+    <th cope="col">ID</th>
+    <th cope="col">Назва</th>
+    <th cope="col">Адреса</th>
+    <th cope="col">Дія</th>
+  </tr>
+  {% for composition in compositions %}
+  <tr>
+    <td>{{ composition.id }}</td>
+    <td>{{ composition.name }}</td>
+    <td>{{ composition.address }}</td>
+    <td scope="row">
+      <div class="d-flex">
+        <form method="post" action="{% url 'products_availability' composition.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm me-2">Наявність товару</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4">Складів не знайдено</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title%}Замовлення {{order.id}}{% endblock %}
+{% block content %}
+    <h1>Замовлення №{{order.id}}</h1>
+    
+    <div class="row">
+        <div class="col-6">
+            <h2>Інформація про клієнта</h2>
+            <p>Ім'я: {{order.client.first_name}}</p>
+            <p>Прізвище: {{order.client.last_name}}</p>
+            <p>Номер телефону: {{order.client.tel_number}}</p>
+            <p>Email: {{order.client.email}}</p>
+        </div class="col-6">
+        <div class="col-6">
+            <div class="col">
+                <div class="row">
+                    <div class="col-6">
+                        <b>Статус замовлення</b>
+                        <form method="get" action="{% url 'change_status' order.id %} " class="col-6" >
+                            <select name="status" onchange="this.form.submit()" class="form-select">
+                                {% for value, label in order.Status.choices %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <b>Склад</b>
+                        <form method="post" action="{% url 'change_composition' order.id %}" id="composition-form">
+                            {% csrf_token %}
+                            <select id="composition" name="composition" style="width:300px;" class="form-select">
+                                {% if order.composition %}
+                                    <option value="{{ order.composition.id }}" selected>
+                                        {{ order.composition.name }}
+                                    </option>
+                                {% endif %}
+                            </select>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <form action="" class="row">
+                        <div class="col-5">
+                            <label for="" class="form-label">Місто</label>
+                            <input type="text" name="city" id="city" {% if order.city %} value="{{order.city}}" {% endif %} placeholder="Місто доставки" class="form-control col-3">
+                        </div>
+                        <div class="col-5">
+                            <label for="" class="form-label">Адреса</label>
+                            <input type="text" name="address" id="address" {% if order.address %} value="{{order.address}}" {% endif %} placeholder="Адреса доставки" class="form-control col-3">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <h1>Додати товар</h1>
+    <form method="post" action="{% url 'add_item' order.id %}">
+        {% csrf_token %}
+        <select id="product" name="product" style="width:300px;">
+            {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity" min="1" value="1">
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+    <h1>Товари</h1>
+    <table border="1" class="table table-striped">
+      <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Назва товару</th>
+                        <th>Статус</th>
+                        <th>IMEI</th>
+                        <th>Ціна</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.orderitems_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <form method="post" action="{% url 'change_item_status' item.id %}" class="status-form col-6" id="status-form">
+                                {% csrf_token %}
+                                <select name="item_status" onchange="this.form.submit()" class="form-select" id="item_status">
+                                    {% for value, label in item.Status.choices %}
+                                        <option value="{{ value }}" {% if item.status == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'change_item_imei' order.id item.id %}" class="col-6" id="imei-form">
+                                {% csrf_token %}
+                                <select name="imei" onchange="this.form.submit()" class="form-select">
+                                    <option value="">IMEI</option>
+                                    {% for a in availability %}
+                                        {% if a.product_id == item.product_id %}
+                                            <option value="{{ a.imei }}" {% if item.availability.imei == a.imei %}selected{% endif %}>{{ a.imei }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'change_price' order.id item.id  %}">
+                                {% csrf_token %}
+                                <input type="number" name="item_price" value="{{ item.price }}" 
+                                    onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'delete_item' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">Товари відсутні</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-warning">
+                        <td colspan="4"><strong>Разом:</strong></td>
+                        <td><strong>{{ total_sum }}</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+    </table>
+    <div class="row">
+        <div class="col-9"></div>
+        <div class="col-3">
+            <form method="post" action="{% url 'orders_list' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Назад</button>
+            </form>
+        </div>
+    </div>
+  </body>
+</html>
+<script>
+    
+$(document).ready(function() {
+    $('#product').select2({
+        placeholder: 'Введіть назву або ID товару',
+        minimumInputLength: 1,
+        ajax: {
+            url: '{% url "products_autocomplete" %}', // Django URL для JSON
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return { q: params.term }; // term, що вводить користувач
+            },
+            processResults: function(data) {
+                return {
+                    results: data.map(function(item) {
+                        return { id: item.id, text: item.name };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+});
+
+$(document).ready(function() {
+    $('#composition').select2({
+        placeholder: 'Назва складу',
+        minimumInputLength: 1,
+        ajax: {
+            url: '{% url "compositions_autocomplete" %}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return { q: params.term };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.map(function(composition) {
+                        return { id: composition.id, text: composition.name };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+    $('#composition').on('change', function() {
+        $('#composition-form').submit();
+    });
+});
+$(document).ready(function() {
+    $('#imei').on('change', function() {
+        $('#imei-form').submit();
+    });})
+    
+$(document).ready(function() {
+    $('#item_status').on('change', function() {
+        $('#status-form').submit();
+    });})
+</script>
+{% if messages %}
+  <div id="messages">
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<style>
+  #messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 300px;
+    z-index: 9999;
+  }
+
+  .message {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #fff;
+  }
+
+  .message.error {
+    background-color: #dc3545; /* червоний */
+  }
+
+  .message.success {
+    background-color: #28a745; /* зелений */
+  }
+</style>
+
+<script>
+  // автоматично ховаємо повідомлення через 3 сек
+  setTimeout(function() {
+    let el = document.getElementById("messages");
+    if (el) el.style.display = "none";
+  }, 3000);
+</script>
+
+{% endblock %}
