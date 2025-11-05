@@ -78,7 +78,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'telegram_bot',
         'USER': 'telegram_bot',
-        'PASSWORD': '314159_Bot',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
